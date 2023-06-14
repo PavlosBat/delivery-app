@@ -24,7 +24,7 @@ router.post('/merchants/login', async(req, res) => {
     try {
         const merchant = await Merchant.findByCredentials(req.body.email, req.body.password)
         const token = await merchant.generateAuthToken()
-        res.send( { merchant, token} )
+        res.send( {merchant, token} )
     } catch (e) {
         res.status(400).send()
     }
