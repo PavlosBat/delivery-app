@@ -6,7 +6,20 @@ const Merchant = require('../models/merchant')
 const authMerch = require('../middleware/authMerch')
 const router = new express.Router()
 
-//1.Create new Merchant...OK
+// //1.Create new Merchant or ADMIN Merchant...OK
+// router.post('/merchants', async(req, res) => {
+//     const merchant = new Merchant(req.body)
+
+//     try {
+//         await merchant.save()
+//         const token = await merchant.generateAuthToken()
+//         res.status(201).send( {merchant, token} )
+//     } catch (e) {
+//         res.status(400).send()
+//     }
+// })
+
+//1.Create new ADMIN Merchant or Merchant...????
 router.post('/merchants', async(req, res) => {
     const merchant = new Merchant(req.body)
 
@@ -91,6 +104,7 @@ router.delete('/merchants/me', authMerch, async(req, res) => {
     }
 })
 
+//middleware for file uploads through npm-multer
 const upload = multer({
     limits: {
         filesize: 1000000

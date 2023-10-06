@@ -1,5 +1,6 @@
 const app = require('./app')
-const Merchant = require('./models/merchant')
+//GIA DOKIMES !!!
+// const Merchant = require('./models/merchant')
 
 const port = process.env.PORT || 3000
 
@@ -9,7 +10,7 @@ app.listen(port, () => {
 })
 
 
-//DOKIMES !!!
+//GIA DOKIMES !!!
 
 //EXAMPLE//
 // const pet = {

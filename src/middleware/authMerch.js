@@ -1,4 +1,3 @@
-//PROBLEM IN AUTH AND LOG MERCHANT
 const jwt = require('jsonwebtoken')
 // const fast2sms = require('fast-two-sms')
 const Merchant = require('../models/merchant')
@@ -7,7 +6,7 @@ const Merchant = require('../models/merchant')
 const authMerch = async (req, res, next) => {
     try {
         const token = req.header('Authorization').replace('Bearer ', '')
-        const decoded = jwt.verify(token, 'mySecret')
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_MERCHANT)
         const merchant = await Merchant.findOne({ _id: decoded._id, 'tokens.token': token })
 
         if (!merchant) {

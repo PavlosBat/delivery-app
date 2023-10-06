@@ -31,9 +31,12 @@ const merchantSchema = new mongoose.Schema({
             }
         }
     },
-    avatar: {
-        type: Buffer
-    },
+    //in case of role-based access:
+
+    // isAdmin: {
+    //     type: Boolean,
+    //     default: false
+    // },
     menu: {
         Starters: [{
             name: {
@@ -42,6 +45,10 @@ const merchantSchema = new mongoose.Schema({
             },
             description: {
                 type: String,
+                required: true
+            },
+            quantity: {
+                type: Number,
                 required: true
             },
             price: {
@@ -65,6 +72,10 @@ const merchantSchema = new mongoose.Schema({
                 type: String,
                 required: true
             },
+            quantity: {
+                type: Number,
+                required: true
+            },
             price: {
                 value: {
                     type: Number,
@@ -84,6 +95,10 @@ const merchantSchema = new mongoose.Schema({
             },
             description: {
                 type: String,
+                required: true
+            },
+            quantity: {
+                type: Number,
                 required: true
             },
             price: {
@@ -107,6 +122,10 @@ const merchantSchema = new mongoose.Schema({
                 type: String,
                 required: true
             },
+            quantity: {
+                type: Number,
+                required: true
+            },
             price: {
                 value: {
                     type: Number,
@@ -118,12 +137,15 @@ const merchantSchema = new mongoose.Schema({
                 }
             }
         }]
+    },    
+    avatar: {
+        type: Buffer
     },
     tokens: [{
-        token: {
-            type: String,
-            required: true
-        }
+            token: {
+                type: String,
+                required: true
+            }
     }]
 }, {
     timestamps: true
@@ -146,7 +168,7 @@ merchantSchema.methods.toJSON = function () {
 //Generate JWToken for Authorization (Middleware)
 merchantSchema.methods.generateAuthToken = async function() {
     const merchant = this
-    const token = jwt.sign({_id: merchant._id.toString() }, 'mySecret')
+    const token = jwt.sign({_id: merchant._id.toString() }, 'mySecret1')
 
     merchant.tokens = merchant.tokens.concat({ token })
     await merchant.save()
