@@ -7,7 +7,8 @@ const merchantSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        unique: true
     },
     password: {
         type: String,
@@ -31,124 +32,196 @@ const merchantSchema = new mongoose.Schema({
             }
         }
     },
-    //in case of role-based access:
+    telephone: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    city: {
+        type: String,
+        required: true,
+        uppercase: true
+    },
+    street:{
+        type: String,
+        required: true,
+        uppercase: true
+    },
+    number: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    postalCode: {
+        type: String,
+        // validate(value) {
+        //     if (!validator.isPostalCode(value)) {
+        //         throw new Error('Postal code is not valid')
+        //     }
+        // }
+    },
+    //in case of role-based access://
 
     // isAdmin: {
     //     type: Boolean,
     //     default: false
     // },
-    menu: {
-        Starters: [{
-            name: {
-                type: String,
-                required: true
-            },
-            description: {
-                type: String,
-                required: true
-            },
-            quantity: {
+    menu: [{
+        category: {
+            type: String,
+            required: true,
+            enum: ['Starters', 'Mains', 'Deserts', 'Drinks']
+        },
+        name: {
+            type: String,
+            required: true
+        },
+        description: {
+            type: String,
+            required: true
+        },
+        quantity: {
+            type: Number,
+            required: true
+        },
+        price: {
+            value: {
                 type: Number,
                 required: true
             },
-            price: {
-                value: {
-                    type: Number,
-                    required: true
-                },
-                currency: {
-                    type: String,
-                    required: true
-                }
+            currency: {
+                type: String,
+                required: true
             }
-        }],
-        Mains: [{
-            name: {
-                type: String,
-                required: true,
-                trim: true
-            },
-            description: {
-                type: String,
-                required: true
-            },
-            quantity: {
-                type: Number,
-                required: true
-            },
-            price: {
-                value: {
-                    type: Number,
-                    required: true
-                },
-                currency: {
-                    type: String,
-                    required: true
-                }
-            }
-        }],
-        Deserts: [{
-            name: {
-                type: String,
-                required: true,
-                trim: true
-            },
-            description: {
-                type: String,
-                required: true
-            },
-            quantity: {
-                type: Number,
-                required: true
-            },
-            price: {
-                value: {
-                    type: Number,
-                    required: true
-                },
-                currency: {
-                    type: String,
-                    required: true
-                }
-            }
-        }],
-        Drinks: [{
-            name: {
-                type: String,
-                required: true,
-                trim: true
-            },
-            description: {
-                type: String,
-                required: true
-            },
-            quantity: {
-                type: Number,
-                required: true
-            },
-            price: {
-                value: {
-                    type: Number,
-                    required: true
-                },
-                currency: {
-                    type: String,
-                    required: true
-                }
-            }
-        }]
-    },    
-    avatar: {
-        type: Buffer
-    },
+        }
+        // Starters: [{
+        //     name: {
+        //         type: String,
+        //         required: true
+        //     },
+        //     description: {
+        //         type: String,
+        //         required: true
+        //     },
+        //     quantity: {
+        //         type: Number,
+        //         required: true
+        //     },
+        //     price: {
+        //         value: {
+        //             type: Number,
+        //             required: true
+        //         },
+        //         currency: {
+        //             type: String,
+        //             required: true
+        //         }
+        //     }
+        // }],
+        // Mains: [{
+        //     name: {
+        //         type: String,
+        //         required: true,
+        //         trim: true
+        //     },
+        //     description: {
+        //         type: String,
+        //         required: true
+        //     },
+        //     quantity: {
+        //         type: Number,
+        //         required: true
+        //     },
+        //     price: {
+        //         value: {
+        //             type: Number,
+        //             required: true
+        //         },
+        //         currency: {
+        //             type: String,
+        //             required: true
+        //         }
+        //     }
+        // }],
+        // Deserts: [{
+        //     name: {
+        //         type: String,
+        //         required: true,
+        //         trim: true
+        //     },
+        //     description: {
+        //         type: String,
+        //         required: true
+        //     },
+        //     quantity: {
+        //         type: Number,
+        //         required: true
+        //     },
+        //     price: {
+        //         value: {
+        //             type: Number,
+        //             required: true
+        //         },
+        //         currency: {
+        //             type: String,
+        //             required: true
+        //         }
+        //     }
+        // }],
+        // Drinks: [{
+        //     name: {
+        //         type: String,
+        //         required: true,
+        //         trim: true
+        //     },
+        //     description: {
+        //         type: String,
+        //         required: true
+        //     },
+        //     quantity: {
+        //         type: Number,
+        //         required: true
+        //     },
+        //     price: {
+        //         value: {
+        //             type: Number,
+        //             required: true
+        //         },
+        //         currency: {
+        //             type: String,
+        //             required: true
+        //         }
+        //     }
+        // }]
+    }],
+    orders: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Order'
+    }],
+    // avatar: {
+    //     type: Buffer
+    // },
     tokens: [{
-            token: {
-                type: String,
-                required: true
-            }
+        token: {
+            type: String,
+            required: true
+        }
     }]
 }, {
+    toJSON: {
+        virtuals: true
+    },
+    toObject: {
+        virtuals: true
+    },
     timestamps: true
+})
+
+// Virtual Populate Orders ???other fields also???
+merchantSchema.virtual('ordersList', {
+    ref: 'Order',
+    localField: '_id',
+    foreignField: 'shop'
 })
 
 //Method to get the Merchant Object documents we want -> to present publicly when profile is requested
@@ -164,6 +237,11 @@ merchantSchema.methods.toJSON = function () {
 
     return merchantObject
 }
+
+//Method to convert currency
+// merchantSchema.methods.currencyConverter = function () {
+
+// }
 
 //Generate JWToken for Authorization (Middleware)
 merchantSchema.methods.generateAuthToken = async function() {

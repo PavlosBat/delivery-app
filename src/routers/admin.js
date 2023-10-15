@@ -67,7 +67,9 @@ router.delete('/admins/me', authAdmin, async(req, res) => {
         if (!admin) {
             return res.status(404).send({ error: "Admin not found"})
         }
-        await admin.remove()
+        //.remove() depreciated in Mongoose v7.0
+        // await admin.remove()
+        await req.admin.deleteOne()
         // sendCancelationEmail(req.admin.email, req.admin.name)
         res.send({message: "Admin deleted successfully"})
     } catch (e) {

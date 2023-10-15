@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken')
 // const fast2sms = require('fast-two-sms')
 const Order = require('../models/order')
 
-//Order JWT Authorization
+// Order JWT Authorization
 const authOrder = async (req, res, next) => {
     try {
         const token = req.header('Authorization').replace('Bearer ', '')

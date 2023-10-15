@@ -4,35 +4,97 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 
 const orderSchema = new mongoose.Schema({
-    //Reference Shop//
-    // shop: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     required: true,
-    //     ref: 'Merchant'
-    // },
-    
     shop: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'Merchant'
+    },
+    email: {
+        type: String,
+        required: true,
+        trim: true,
+        lowercase: true,
+        validate(value) {
+            if (!validator.isEmail(value)) {
+                throw new Error('Email is invalid')
+            }
+        }
+    },
+    phone: {
+        type: String,
+        required: true,
+        trim: true
+        // validate(value) {
+        //     if (!validator.isMobilePhone(value, {strictMode: true})) {
+        //         throw new Error('Provide a valid mobile number with "+" country code in front')
+        //     }
+        // }
+    },
+    city: {
+        type: String,
+        required: true,
+        uppercase: true
+    },
+    street:{
+        type: String,
+        required: true,
+        uppercase: true
+    },
+    number: {
+        type: String,
+        required: true,
+        uppercase: true,
+        trim: true
+    },
+    postalCode: {
+        type: String
+        // validate(value) {
+        //     if (!validator.isPostalCode(value)) {
+        //         throw new Error('Postal code is not valid')
+        //     }
+        // }
+    },
+    ringBellName: {
         type: String,
         required: true
     },
     cart: [{
-
+        item: {
+            category:{
+                type: String,
+                required: true,
+                enum:['Starters', 'Mains', 'Deserts', 'Drinks']
+            },   
+            name: {
+                type: String
+            },
+            quantity: {
+                type: Number
+            },
+            price: {
+                type: Number
+            }
+        }
     }],
-    email: {
-        type: String,
-        required: true,
-        trim: true
+    moneyAmount: {
+        type: Number
+        // required: true
+        // euro: {
+        //     type: String
+        // },
+        // dollars: {
+        //     type: String
+        // }
     },
-    phone: {
-        type: Number,
-        required: true,
-        trim: true
+    paymentMethod: {
+        type: String
     },
-    address: {
-        type: String,
-        required: true,
-        trim: true
-    },
+    tokens: [{
+        token: {
+            type: String,
+            required: true
+        }
+    }]
 }, {
     timestamps: true
 })
@@ -44,17 +106,27 @@ orderSchema.methods.toJSON = function () {
     const order = this
     const orderObject = order.toObject()
 
-    delete orderObject.password
     delete orderObject.tokens
-    delete orderObject.avatar
 
     return orderObject
+}
+
+//Method to calculate the moneyAmount
+orderSchema.methods.calculateTotalAmount = async function () {
+    const order = this
+    let totalAmount = 0
+
+    order.cart.forEach((itemObj) => {
+            totalAmount += itemObj.item.quantity * itemObj.item.price
+    }) 
+    
+   order.moneyAmount = totalAmount
 }
 
 //Generate JWToken for Authorization (Middleware)//
 orderSchema.methods.generateAuthToken = async function() {
     const order = this
-    const token = jwt.sign({_id: order._id.toString() }, 'mySecret3')
+    const token = jwt.sign({ _id: order._id.toString() }, 'mySecret3')
 
     order.tokens = order.tokens.concat({ token })
     await order.save()
@@ -64,32 +136,34 @@ orderSchema.methods.generateAuthToken = async function() {
 }
 
 //Authentication with Credentials (email&password)//
-orderSchema.statics.findByCredentials = async (email, password) => {
-    const order = await Order.findOne({ email })
+// orderSchema.statics.findByCredentials = async (email, password) => {
+//     const order = await Order.findOne({ email })
     
-    // error check no clear feedback for safety reasons//
-    if (!order) {
-        throw new Error('Unable to login')
-    }
+//     //Error check with no clear feedback for safety reasons//
+//     if (!order) {
+//         throw new Error('Unable to login')
+//     }
 
-    const isMatch = await bcrypt.compare(password, order.password)
+//     const isMatch = await bcrypt.compare(password, order.password)
 
-    if (!isMatch) {
-        throw new Error('Unable to login')
-    }
+//     if (!isMatch) {
+//         throw new Error('Unable to login')
+//     }
 
-    return merchant    
-}
+//     return merchant    
+// }
 
-//Hash the plain text password for safety//
+// Calculate the total money amount of the order//
 orderSchema.pre('save', async function(next) {
     const order = this
-
-    if (order.isModified('password')) {
-        order.password = await bcrypt.hash(order.password, 8)
+    try {
+        if (order.isModified('cart')) {
+            await order.calculateTotalAmount()
+        }
+        next()
+    } catch (e) {
+        throw new Error('Error calculating total order money amount')
     }
-
-    next()
 })
 
 const Order = mongoose.model('Order', orderSchema)

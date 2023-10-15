@@ -78,11 +78,11 @@ router.get('/merchants/me', authMerch, async(req, res) => {
 //!!!!!!Must add mail for password or mail, +menu!!!!
 router.patch('/merchants/me', authMerch, async(req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = ['name', 'password', 'email', 'menu']
+    const allowedUpdates = ['name', 'password', 'email', 'telephone', 'city', 'street', 'number', 'postalCode', 'menu']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
-        return res.status(400).send('error: invalid updates')
+        return res.status(400).send({Error: 'invalid updates'})
     }
 
     try {
@@ -90,14 +90,19 @@ router.patch('/merchants/me', authMerch, async(req, res) => {
         await req.merchant.save()
         res.send(req.merchant)
     } catch (e) {
-        res.status(400).send()
+        res.status(500).send()
     }
 })
 
 //7.Delete Merchant Profile
 router.delete('/merchants/me', authMerch, async(req, res) => {
     try {
-        await req.merchant.remove()
+
+        //.remove() depreciated in Mongoose v7.0
+        // await req.merchant.remove()
+
+        await req.merchant.deleteOne()
+        // sendCancelationEmail(req.merchant.email, req.merchant.name)
         res.send(req.merchant)
     } catch (e) {
         res.status(500).send(e) 
@@ -150,6 +155,7 @@ router.delete('/merchants/me/avatar', authMerch, async(req, res) => {
     if (!req.merchant.avatar) {
         res.status(400).send('No avatar to delete!')
     }
+    
     try {
         req.merchant.avatar = undefined
         await req.user.save()
