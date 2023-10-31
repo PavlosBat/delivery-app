@@ -1,10 +1,9 @@
-// const { Order, orderEventEmitter } = require('../../src/models/order')
 // Connect client to WebSockets
 const socket = io()
 
 //ELEMENTS
 //login page
-const $loginForm = document.querySelector('#login-form')
+// const $loginForm = document.querySelector('#login-form')
 
 //dashboard page
 
@@ -63,16 +62,16 @@ socket.on('message', (message) => {
 
 //EMIT EVENTS
 //Login Inputs
-$loginForm.addEventListener('submit', (e) => {
-    //
-    e.preventDefault()
+// $loginForm.addEventListener('submit', (e) => {
+//     //
+//     e.preventDefault()
 
-    const merchUsername = e.target.elements.merchant.value
-    const merchPassword = e.target.elements.password.value
+//     const merchUsername = e.target.elements.merchant.value
+//     const merchPassword = e.target.elements.password.value
 
-    socket.emit('login', {merchUsername, merchPassword})
+//     socket.emit('login', {merchUsername, merchPassword})
 
-})
+// })
 
 socket.emit('finaliseOrder', (order) => {
 
