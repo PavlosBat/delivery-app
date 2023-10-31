@@ -2,7 +2,7 @@ const express = require('express')
 const multer = require('multer')
 const sharp = require('sharp')
 // const { update } = require('../models/merchant')
-const Merchant = require('../models/merchant')
+const { Merchant, merchantLoginEventEmitter } = require('../models/merchant')
 const authMerch = require('../middleware/authMerch')
 const router = new express.Router()
 
@@ -37,6 +37,10 @@ router.post('/merchants/login', async(req, res) => {
     try {
         const merchant = await Merchant.findByCredentials(req.body.email, req.body.password)
         const token = await merchant.generateAuthToken()
+
+        //Node.js EventEmit merchantLogin (send the _id as an identifier for the Web Socket room)
+        merchantLoginEventEmitter.emit('merchantLogin', merchant._id)
+
         res.send( {merchant, token} )
     } catch (e) {
         res.status(400).send()
@@ -158,7 +162,7 @@ router.delete('/merchants/me/avatar', authMerch, async(req, res) => {
     
     try {
         req.merchant.avatar = undefined
-        await req.user.save()
+        await req.merchant.save()
         res.send()
     } catch (e) {
         res.status(500).send()

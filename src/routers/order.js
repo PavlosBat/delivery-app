@@ -1,15 +1,18 @@
 const express = require('express')
-
-const Order = require('../models/order')
+const { Order, orderEventEmitter } = require('../models/order')
 const authOrder = require('../middleware/authOrder')
 const router = new express.Router()
 
-// OK
+// OK !!! BUT NEEDS PAYMENT
 router.post('/orders', async (req, res) => {
     const order = new Order(req.body)
 
     try {
         await order.save()
+
+        //Node.js EventEmit newOrder _alert merchant!! It needs to use rooms & maybe need to clear some data that merchant can see in his page
+        orderEventEmitter.emit('newOrder', order)
+
         const token = await order.generateAuthToken()
         res.status(201).send( {order, token} )
     } catch (e) {

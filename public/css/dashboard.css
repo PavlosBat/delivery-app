@@ -1,0 +1,45 @@
+/* * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+} */
+
+h1 {
+    padding: auto ;
+    background-color: rgba(89, 87, 49, 0.895)
+}
+
+.alert-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.alert {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.dashboard-container {
+    display: flex;
+    padding: 20px;
+}
+
+.orders-list, .order-details {
+    flex: 1;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+    padding: 10px;
+}
+
+.order-details {
+    margin-right: 0;
+}

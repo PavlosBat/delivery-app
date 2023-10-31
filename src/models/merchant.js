@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
+const EventEmitter = require('events')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
@@ -286,4 +287,11 @@ merchantSchema.pre('save', async function(next) {
 
 const Merchant = mongoose.model('Merchant', merchantSchema)
 
-module.exports = Merchant
+//Define Merchant Event Emitter for merchant login (to avoid using WebSockets inside Express routes)
+class MerchantEventEmitter extends EventEmitter{}
+const merchantLoginEventEmitter = new MerchantEventEmitter
+
+module.exports = {
+    Merchant,
+    merchantLoginEventEmitter
+}

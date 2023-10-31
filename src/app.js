@@ -17,7 +17,7 @@ const publicDirectoryPath = path.join(__dirname, '../public')
 
 //Setting up hbs library and view location
 // app.set('view engine', 'hbs')
-// hbs.partials(partialsPath)
+// hbs.partials(partialsPath) 
 
 app.use(express.static(publicDirectoryPath))
 // app.use(express.static(viewsPath))

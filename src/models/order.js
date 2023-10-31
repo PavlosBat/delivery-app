@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
+const EventEmitter = require('events')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 
@@ -168,4 +169,11 @@ orderSchema.pre('save', async function(next) {
 
 const Order = mongoose.model('Order', orderSchema)
 
-module.exports = Order
+//Define Order Event Emitter for newOrder (to avoid using WebSockets inside Express routes)
+class OrderEventEmitter extends EventEmitter{}
+const orderEventEmitter = new OrderEventEmitter
+
+module.exports = {
+    Order,
+    orderEventEmitter
+}

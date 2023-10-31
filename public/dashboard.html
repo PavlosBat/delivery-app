@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+        <title>Merchant Profile</title>
+
+        <h1>Merchant Dashboard</h1>
+    
+        <link rel="stylesheet" href="css/dashboard.css">
+        <!-- chat examle code -->
+        <!--link rel="icon" href="/fav/favicon.png">
+        <link rel="stylesheet" href="/css/styles.min.css"--> 
+         
+    </head>
+
+
+    
+    <body>
+        
+        <!--order alert-->
+        <div class="order-alert" id="order-alert">
+            <p>New Order Received!</p>
+            <button id="accept-order">Accept</button>
+            <button id="decline-order">Decline</button>
+        </div>
+
+        <!--Order details will be dynamically added here -->
+        <div class="order-details" id="orderDetails">
+            <h2>Order Details:</h2>
+                
+            <button onclick="finalizeOrder()">Finalize Order</button>
+        </div>
+    
+        <!--Load files-->
+        <script src="/js/dashboard.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+    
+    </body>
+   
+
+    
+</html>
+

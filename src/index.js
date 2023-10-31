@@ -1,24 +1,49 @@
 const http = require('http')
 // const express = require('express')
 const app = require('./app')
+const {orderEventEmitter} = require('./models/order')
+const {merchantLoginEventEmitter} = require('./models/merchant')
 const socketio = require('socket.io')
 
 //Modifying express API to be able to connect with 
 const httpServer = http.createServer(app)
 const io = socketio(httpServer)
 
+//Middleware to add socket to req object
+app.use((req, res, next) => {
+    req.io = io
+    next()
+})
+
 const port = process.env.PORT || 3000
 
-//io.socket server
+//???ΜΑΛΛΟΝ ΑΚΥΡΟ??? io.socket server GENERAL
 io.on('connection', (socket) => {
     console.log('New WebSocket connection established')
 
-    //Receive login credentials
-    socket.on('login', ({email, password}, callback) => {
+    //EventEmitter scenario
+    // merchantLoginEventEmitter.on('merchantLogin', (merchantId) => {
+    //     socket.emit('join')
 
+    // })
+
+    socket.on('disconnect', () => {
+        io.emit('message', 'WebSocket Connection terminated')
     })
+})
 
+// //io.socket Server Room for each Merchant
+// merchantLoginEventEmitter.on('merchantLogin', (merchantId) => {
+//     io.on('connection', (socket) => {
+//         socket.join(merchantId)
+//         console.log('New Web Socket connection established!')
 
+//     })
+// })
+
+//orderEventEmitter Listener => and emit (Socket.io room) to Client(merchants.js)
+orderEventEmitter.on('newOrder', (order) => {
+    io.to(order.shop.toString()).emit('newOrder', order)
 })
 
 //Server call
