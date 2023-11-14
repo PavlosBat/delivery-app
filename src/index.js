@@ -1,49 +1,68 @@
+//External Modules
 const http = require('http')
 // const express = require('express')
 const app = require('./app')
+const socketio = require('socket.io')
+
+//Project Modules
+const {addActiveOrder, removeActiveOrder, getActiveOrdersForMerchant, sanitizeList} = require('./utils/activeOrdersNEW')//check folder
 const {orderEventEmitter} = require('./models/order')
 const {merchantLoginEventEmitter} = require('./models/merchant')
-const socketio = require('socket.io')
+
+//Port
+const port = process.env.PORT || 3000
 
 //Modifying express API to be able to connect with 
 const httpServer = http.createServer(app)
 const io = socketio(httpServer)
 
-//Middleware to add socket to req object
-app.use((req, res, next) => {
-    req.io = io
-    next()
-})
-
-const port = process.env.PORT || 3000
-
-//???ΜΑΛΛΟΝ ΑΚΥΡΟ??? io.socket server GENERAL
+//!!!!Scenario 1__Point of socket connection to server => Every time a socket connects the code of the callback runs.
 io.on('connection', (socket) => {
     console.log('New WebSocket connection established')
+    
+    merchantLoginEventEmitter.on('merchantLogin', (merchantId) => {
+        
+        //create room based on merchantId
+        socket.join(merchantId)
 
-    //EventEmitter scenario
-    // merchantLoginEventEmitter.on('merchantLogin', (merchantId) => {
-    //     socket.emit('join')
+        // const activeOrders = getListForMerchant()???
+        
+        //Sanitize order data only for significant merchant and make get for dashboard list less data
+        const activeOrdersForMerchant = getActiveOrdersForMerchant(merchantId)
+        const dataForList = sanitizeList(activeOrdersForMerchant)
 
-    // })
+        //Send active orders and details for rendering
+        io.to(merchantId).emit('currentOrders', dataForList)
+    })
 
+    //Listen when order is finalized to remove it from active orders and change it's status????
+    socket.on('finalizeOrder', (id) => {
+
+
+    })
+    
+    //Merchant socket disconnection
     socket.on('disconnect', () => {
-        io.emit('message', 'WebSocket Connection terminated')
+        console.log('WebSocket Connection terminated')
     })
 })
 
-// //io.socket Server Room for each Merchant
-// merchantLoginEventEmitter.on('merchantLogin', (merchantId) => {
-//     io.on('connection', (socket) => {
-//         socket.join(merchantId)
-//         console.log('New Web Socket connection established!')
 
-//     })
-// })
-
-//orderEventEmitter Listener => and emit (Socket.io room) to Client(merchants.js)
+//orderEventEmitter Listener => emit (Socket.io room) to Client(merchants.js)
 orderEventEmitter.on('newOrder', (order) => {
-    io.to(order.shop.toString()).emit('newOrder', order)
+    
+    //Add new order to active orders (returns error if exists)
+    const newOrder = addActiveOrder(order)
+
+    //Take the merchantId to use it as room key
+    const merchantId = newOrder.shop
+    
+    //Sanitize order data only for significant merchant and make get for dashboard list less data
+    const activeOrdersForMerchant = getActiveOrdersForMerchant(merchantId)
+    const dataForList = sanitizeList(activeOrdersForMerchant)
+    
+    //Emit updated active orders list to specific merchant
+    io.to(merchantId).emit('newOrder', dataForList)
 })
 
 //Server call
@@ -51,18 +70,32 @@ httpServer.listen(port, () => {
     console.log(`Server is up on port ${port}`)
 })
 
+// //!!!!Scenario 2__merchantLoginEventEmitter Listener => establish a room for the merchantId who logged in
+// merchantLoginEventEmitter.on('merchantLogin', (merchantId) => {
+//     io.on('connection', (socket) => {
+//         console.log('New WebSocket connection established')
+
+//         //Room connection for merchant(client)
+//         socket.join(merchantId)
+
+//         //Disconnect merchant (browser tab close)
+//         socket.on('disconnect', () => {
+//                 console.log('WebSocket Connection terminated')
+//         })
+//     })
+// })
 
 //GIA DOKIMES !!!
 // const Merchant = require('./models/merchant')
 
 //EXAMPLE//
 // const pet = {
-//     name: 'Hal'
-// }
-
-// pet.toJSON = function () {
-//     console.log(this)
-//     return this
+    //     name: 'Hal'
+    // }
+    
+    // pet.toJSON = function () {
+        //     console.log(this)
+        //     return this
 // }
 
 // console.log(JSON.stringify(pet))

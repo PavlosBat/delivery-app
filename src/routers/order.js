@@ -11,7 +11,7 @@ router.post('/orders', async (req, res) => {
         await order.save()
 
         //Node.js EventEmit newOrder _alert merchant!! It needs to use rooms & maybe need to clear some data that merchant can see in his page
-        orderEventEmitter.emit('newOrder', order)
+        orderEventEmitter.emit('order', order)
 
         const token = await order.generateAuthToken()
         res.status(201).send( {order, token} )

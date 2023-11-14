@@ -1,54 +1,51 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
         <title>Merchant Dashboard</title>
+        <h1>Merchant Dashboard</h1>
 
-        <link rel="stylesheet" href="styles1.css">
-        
+        <!--LOAD CSS styles & icon-->
+        <link rel="stylesheet" href="css/dashboard.css">
+        <!-- <link rel="stylesheet" href="css/styles.css"> -->
     </head>
-    
-    <body>
-        <!-Containers-->
-        <!-- <div class="container">
-            <h1>New Orders</h1>
-            <div id="orderDetails"></div>
-             Add other components as needed -->
-        <!-- </div> -->
 
-        <!-- <script>
-            // Retrieve order details from local storage
-            const order = JSON.parse(localStorage.getItem('newOrder'));
-            if (order) {
-                const orderDetailsDiv = document.getElementById('orderDetails');
-                orderDetailsDiv.innerHTML = `
-                    <p>Item: ${order.item.name}</p>
-                    <p>Quantity: ${order.item.quantity}</p>
-                    <button onclick="finalizeOrder('${order._id}')">Finalize</button>
-                `;
-            } else {
-                alert('No new orders available.');
-            }
-        </script> -->
-        
-        <!--Order details will be dynamically added here -->
-        <!-- <div class="order-details" id="orderDetails">
-            <h2>Order Details:</h2>
-                
-            <button onclick="">Finalize Order</button>
+    <body>
+        <!-- alert MALLON AKYRO???? -->
+        <!-- <div class="alert-container" id="alertContainer">
+            <div class="alert">
+                <p>New Order received</p>
+                <button onclick="closeAlert()">OK</button>
+            </div>
         </div> -->
         
-    
-        <!-- Load files -->
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
-        <script src="/socket.io/socket.io.js"></script>
-        <script src="/js/dashboard.js"></script> -->
+        <!--Create containers (divs) to make a nice layout-->
+        <div class="dashboard-container">
+            <div class="orders-list" id="ordersList">
+                <h3>Order list (active):</h3>
+            </div>
+
+            <div class="order-details" id="orderDetails">
+                <h3>Order details:</h3>
+                <button onclick="finalizeOrder()">Finalize Order</button>
+            </div>
+        </div>
         
-    <!-- </body> --> 
+        <!-- Templates-->
+        <!-- Sidebar Template -->
+        <script id="sidebar-template" type="text/html">
+            <ul class="list">
+                {{#dataForList}}
+                <li data-order-id="{{_id}}">{{listName}}</li>
+                {{/dataForList}}
+            </ul>
+        </script>
 
-    
-
-<!-- </html> -->
+        <!--LOAD LIBRARIES-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="js/dashboard.js"></script>
+    </body>
+</html>

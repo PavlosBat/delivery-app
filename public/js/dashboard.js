@@ -2,13 +2,41 @@
 const socket = io()
 
 //ELEMENTS
-//login page
-// const $loginForm = document.querySelector('#login-form')
+//check again button
+const $finalizeButton = document.querySelector('#button')
+
+//TEMPLATES
+const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML
+const detailsTemplate = document.querySelector().innerHTML
+
+//LISTENERS
+//Listen Connection & render order list
+socket.on('currentOrders', (dataForList) => {
+    const html = Mustache.render(sidebarTemplate, dataForList)
+    document.querySelector('#ordersList').innerHTML = html
+})
+
+//Listen New Order & render updated order list 
+socket.on('newOrder', (dataForlist) => {
+    console.log("New order received")
+    const html = Mustache.render(detailsTemplate, dataForList)
+    document.querySelector('').innerHTML = html //#id name
+})
+
+//EMITTERS???
+//Emit order finalization (from button) to server (where removal will take place and updated list will be sent back)
+$finalizeButton.addEventListener('click', () => {
+
+})
+
+//Emit 
+
+
+
 
 //dashboard page
 
 
-//TEMPLATES
 
 
 //FUNCTIONS FOR ORDERS
@@ -42,10 +70,6 @@ const socket = io()
 // }
 
 
-//Event listeners
-socket.on('message', (message) => {
-    console.log(message)
-})
 
 //location Example
 // document.querySelector('#send-location').addEventListener('click', () => {
@@ -72,9 +96,3 @@ socket.on('message', (message) => {
 //     socket.emit('login', {merchUsername, merchPassword})
 
 // })
-
-socket.emit('finaliseOrder', (order) => {
-
-    //button + change status of order( patchOrder)
-    
-})

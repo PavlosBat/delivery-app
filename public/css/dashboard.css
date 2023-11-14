@@ -1,11 +1,11 @@
-/* * {
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-} */
+}
 
 h1 {
-    padding: auto ;
+    padding-left: 20px ;
     background-color: rgba(89, 87, 49, 0.895)
 }
 
@@ -42,4 +42,32 @@ h1 {
 
 .order-details {
     margin-right: 0;
+}
+
+
+
+
+/* New Pavlos */
+/* Order Sidebar Styles */
+
+.orders-list {
+    flex: 1;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+    padding: 10px;
+}
+
+
+/* ta 2 epomena exoun stul apo chatApp */
+.list-title {
+    font-weight: 500;
+    font-size: 18px;
+    margin-bottom: 4px;
+    padding: 12px 24px 0 24px;
+}
+
+.users {
+    list-style-type: none;
+    font-weight: 300;
+    padding: 12px 24px 0 24px;
 }
