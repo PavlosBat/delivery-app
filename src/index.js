@@ -1,11 +1,10 @@
 //External Modules
 const http = require('http')
-// const express = require('express')
 const app = require('./app')
 const socketio = require('socket.io')
 
-//Project Modules
-const {addActiveOrder, removeActiveOrder, getActiveOrdersForMerchant, sanitizeList} = require('./utils/activeOrdersNEW')//check folder
+//Internal Modules
+const {addActiveOrder, removeActiveOrder, getActiveOrdersForMerchant, sanitizeList} = require('./utils/activeOrdersNEW')//check folder!!!!
 const {orderEventEmitter} = require('./models/order')
 const {merchantLoginEventEmitter} = require('./models/merchant')
 
@@ -22,22 +21,44 @@ io.on('connection', (socket) => {
     
     merchantLoginEventEmitter.on('merchantLogin', (merchantId) => {
         
-        //create room based on merchantId
+        //Create room based on merchantId 
         socket.join(merchantId)
 
-        // const activeOrders = getListForMerchant()???
-        
-        //Sanitize order data only for significant merchant and make get for dashboard list less data
+        //Sanitize order data only for significant merchant and get dashboard list with less data
         const activeOrdersForMerchant = getActiveOrdersForMerchant(merchantId)
         const dataForList = sanitizeList(activeOrdersForMerchant)
 
-        //Send active orders and details for rendering
-        io.to(merchantId).emit('currentOrders', dataForList)
+        //Send active orders list for rendering
+        io.to(merchantId).emit('currentOrders', {
+            merchantId,
+            dataForList,
+            fullDetails: activeOrdersForMerchant
+        })
     })
 
     //Listen when order is finalized to remove it from active orders and change it's status????
-    socket.on('finalizeOrder', (id) => {
+    socket.on('finalizeOrder', async (data) => {
 
+        //Retrieve merchantId and orderId for deletion
+        const merchantId = data.merchantId
+        const orderId = data.viewedOrderId
+
+        //update order status in database??? declare function...
+        await updateOrderStatusDatabase(orderId, 'Finalized')
+
+        //remove order from active orders array
+        removeActiveOrder(orderId)
+
+        //get updated active order list for significant merchant and get dashboard list
+        const activeOrdersForMerchant = getActiveOrdersForMerchant(merchantId)
+        const dataForList = sanitizeList(activeOrdersForMerchant)
+
+        //emit the updated active orders to the merchant
+        io.to(merchantId).emit('update', {
+            merchantId,
+            dataForList,
+            fullDetails: activeOrdersForMerchant
+        })
 
     })
     
@@ -62,7 +83,11 @@ orderEventEmitter.on('newOrder', (order) => {
     const dataForList = sanitizeList(activeOrdersForMerchant)
     
     //Emit updated active orders list to specific merchant
-    io.to(merchantId).emit('newOrder', dataForList)
+    io.to(merchantId).emit('newOrder', {
+        merchantId,
+        dataForList,
+        fullDetails: activeOrdersForMerchant
+    })
 })
 
 //Server call

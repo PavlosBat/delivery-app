@@ -4,6 +4,12 @@ const EventEmitter = require('events')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 
+const {updateExchangeRates, convertPrice} = require('../utils/currencies')
+
+//2nd way update merchant after order ???
+// const {Merchant} = require('./merchant')
+
+//Mongoose Schema for orders
 const orderSchema = new mongoose.Schema({
     shop: {
         type: mongoose.Schema.Types.ObjectId,
@@ -16,7 +22,7 @@ const orderSchema = new mongoose.Schema({
         trim: true,
         lowercase: true,
         validate(value) {
-            if (!validator.isEmail(value)) {
+            if (!validator.isEmail(value)) { //npm validator method
                 throw new Error('Email is invalid')
             }
         }
@@ -59,6 +65,13 @@ const orderSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    targetCurrency: {
+        type: String,
+        required: true,
+        uppercase: true,
+        enum: ['EUR', 'USD', 'GBP', 'JPY'],
+        default: 'EUR'
+    },
     cart: [{
         item: {
             category:{
@@ -74,21 +87,27 @@ const orderSchema = new mongoose.Schema({
             },
             price: {
                 type: Number
+            },
+            currency: {
+                type: String
             }
         }
     }],
-    moneyAmount: {
-        type: Number
-        // required: true
-        // euro: {
-        //     type: String
-        // },
-        // dollars: {
-        //     type: String
-        // }
+    moneyAmount: { //else without type: Number without nested objects
+        value:{
+            type: Number
+        },
+        currency: {
+            type: String
+        }
     },
-    paymentMethod: {
-        type: String
+    //??? comment if not use Stripe
+    // paymentMethod: {
+    //     type: String
+    // },
+    status: {
+        type: String,
+        default: 'Received and pending'
     },
     tokens: [{
         token: {
@@ -121,40 +140,61 @@ orderSchema.methods.calculateTotalAmount = async function () {
             totalAmount += itemObj.item.quantity * itemObj.item.price
     }) 
     
-   order.moneyAmount = totalAmount
+    //order.moneyAmount = totalAmount
+    order.moneyAmount.value = totalAmount
+    order.moneyAmount.currency = order.targetCurrency
 }
 
 //Generate JWToken for Authorization (Middleware)//
 orderSchema.methods.generateAuthToken = async function() {
     const order = this
-    const token = jwt.sign({ _id: order._id.toString() }, 'mySecret3')
+    const token = jwt.sign({ _id: order._id.toString() }, process.env.JWT_SECRET_ORDER)
 
     order.tokens = order.tokens.concat({ token })
-    await order.save()
+    // await order.save()??? if not save in order router
 
     return token
     
 }
 
-//Authentication with Credentials (email&password)//
-// orderSchema.statics.findByCredentials = async (email, password) => {
-//     const order = await Order.findOne({ email })
-    
-//     //Error check with no clear feedback for safety reasons//
-//     if (!order) {
-//         throw new Error('Unable to login')
+// Validation for existing "shop" field (Merchant _id)????????? 
+// orderSchema.pre('save', async function(next) {
+//     const order = this
+//     const merchantExists = await mongoose.model('Merchant').exists({ _id: order.shop })
+//     if (!merchantExists) {
+//         throw new Error('Merchant not found')
 //     }
+//     next()
+// })
 
-//     const isMatch = await bcrypt.compare(password, order.password)
+//Convert prices to chosen currency
+orderSchema.pre('save', async function(next) {
+    const order = this
+    try {
+        //fetch exchange rates
+        await updateExchangeRates()
 
-//     if (!isMatch) {
-//         throw new Error('Unable to login')
-//     }
+        //check if need to convert currency
+        if (order.targetCurrency && order.targetCurrency !== 'EUR') {
 
-//     return merchant    
-// }
+        //convert each item's price and update currency field and calculate the total amount????
+        for (const item of order.cart) { 
+            console.log('Item before conversion:', item)//for testing
+            
+            item.item.price = convertPrice(item.item.price, order.targetCurrency)
+            // console.log(item.item.price)//for testing
+            item.item.currency = order.targetCurrency
+            // console.log(item.item.currency)//for testing
+        }
+    }
+    console.log(order.cart)//for testing
+    next()
+    } catch (e) {
+        throw new Error('Error converting prices to chosen currency')
+    }
+})
 
-// Calculate the total money amount of the order//
+//Calculate the total money amount of the order
 orderSchema.pre('save', async function(next) {
     const order = this
     try {
@@ -167,6 +207,17 @@ orderSchema.pre('save', async function(next) {
     }
 })
 
+//2nd way to update Merchant to store the new order in his orders field (1st in order .post)
+// orderSchema.post('save', async function() {
+//     const order = this
+//     try {
+//         await Merchant.findByIdAndUpdate(order.shop, { $push: { orders: order._id } })
+//     } catch (e) {
+//         console.error('Error updating Merchant with new order', e)
+//     }
+// })
+
+//Create model from schema
 const Order = mongoose.model('Order', orderSchema)
 
 //Define Order Event Emitter for newOrder (to avoid using WebSockets inside Express routes)
@@ -177,3 +228,4 @@ module.exports = {
     Order,
     orderEventEmitter
 }
+    

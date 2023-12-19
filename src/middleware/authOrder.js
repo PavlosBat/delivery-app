@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 // const fast2sms = require('fast-two-sms')
-const Order = require('../models/order')
+const { Order }= require('../models/order')
 
 // Order JWT Authorization
 const authOrder = async (req, res, next) => {
@@ -16,8 +16,10 @@ const authOrder = async (req, res, next) => {
         //save successfull authorized token & order
         req.token = token
         req.order = order
+
         next()
     } catch (e) {
+        console.error("Authentication error: ", e.message)
         res.status(401).send({ error: 'Please authorize me' })
     }
 }

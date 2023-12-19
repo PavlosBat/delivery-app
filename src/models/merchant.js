@@ -92,7 +92,8 @@ const merchantSchema = new mongoose.Schema({
             },
             currency: {
                 type: String,
-                required: true
+                uppercase: true,
+                default: "EUR" 
             }
         }
         // Starters: [{
@@ -209,16 +210,18 @@ const merchantSchema = new mongoose.Schema({
         }
     }]
 }, {
+    //explanation???
     toJSON: {
         virtuals: true
     },
+    //explanation???
     toObject: {
         virtuals: true
     },
     timestamps: true
 })
 
-// Virtual Populate Orders ???other fields also???
+// Virtual Populate Orders ???other fields also??? +explanation???
 merchantSchema.virtual('ordersList', {
     ref: 'Order',
     localField: '_id',
@@ -239,21 +242,15 @@ merchantSchema.methods.toJSON = function () {
     return merchantObject
 }
 
-//Method to convert currency
-// merchantSchema.methods.currencyConverter = function () {
-
-// }
-
 //Generate JWToken for Authorization (Middleware)
 merchantSchema.methods.generateAuthToken = async function() {
     const merchant = this
-    const token = jwt.sign({_id: merchant._id.toString() }, 'mySecret1')
+    const token = jwt.sign({_id: merchant._id.toString() }, process.env.JWT_SECRET_MERCHANT)
 
     merchant.tokens = merchant.tokens.concat({ token })
     await merchant.save()
 
-    return token
-    
+    return token  
 }
 
 //Authentication with Credentials (email&password)
@@ -285,6 +282,7 @@ merchantSchema.pre('save', async function(next) {
     next()
 })
 
+//Create model from schema
 const Merchant = mongoose.model('Merchant', merchantSchema)
 
 //Define Merchant Event Emitter for merchant login (to avoid using WebSockets inside Express routes)

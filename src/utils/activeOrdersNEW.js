@@ -61,6 +61,7 @@ const sanitizeList = (activeListForId) => {
     const dashboardList = []
     activeListForId.forEach((order) => {
         dashboardList.push({
+            merchantId: order.shop, //!!!!! export for client to know always the merchantId
             _id: order._id,
             listName: order.timeOnly + '' + order.street + '' + order.number + '' + order.ringBellName
         })
@@ -68,17 +69,17 @@ const sanitizeList = (activeListForId) => {
     return dashboardList
 }
 
+// generateOrderDetails
+//??? NOT READY YET
+// const generateOrderDetails = (order) => {
+//     const detailItem = order.toString()
+//     return { order, detailItem }
+// }
+
 module.exports = {
     addActiveOrder,
     removeActiveOrder,
     getActiveOrdersForMerchant,
     sanitizeList
+    // generateOrderDetails
 }
-
-// generateOrderDetails
-
-//??? NOT READY YET
-// const generateOrderDetails = (order) => {
-//     const detailItem = order.toString()
-//     return detailItem
-// }

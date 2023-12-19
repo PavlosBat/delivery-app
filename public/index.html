@@ -8,19 +8,13 @@
         <h1>Merchant Dashboard</h1>
 
         <!--LOAD CSS styles & icon-->
-        <link rel="stylesheet" href="css/dashboard.css">
+        <link rel="stylesheet" href="css/dashboard1.css">
         <!-- <link rel="stylesheet" href="css/styles.css"> -->
     </head>
 
     <body>
-        <!-- alert MALLON AKYRO???? -->
-        <!-- <div class="alert-container" id="alertContainer">
-            <div class="alert">
-                <p>New Order received</p>
-                <button onclick="closeAlert()">OK</button>
-            </div>
-        </div> -->
         
+        <!-- CONTAINERS -->
         <!--Create containers (divs) to make a nice layout-->
         <div class="dashboard-container">
             <div class="orders-list" id="ordersList">
@@ -28,24 +22,40 @@
             </div>
 
             <div class="order-details" id="orderDetails">
-                <h3>Order details:</h3>
-                <button onclick="finalizeOrder()">Finalize Order</button>
+                <button id="finalizeButton">Finalize Order</button>
             </div>
         </div>
         
-        <!-- Templates-->
+        <!-- TEMPLATES-->
         <!-- Sidebar Template -->
         <script id="sidebar-template" type="text/html">
             <ul class="list">
                 {{#dataForList}}
-                <li data-order-id="{{_id}}">{{listName}}</li>
+                <li class="order-item" data-order-id="{{_id}}">{{listName}}</li>
                 {{/dataForList}}
             </ul>
         </script>
 
+        <!-- Order Details Template -->
+        <script id="order-details-template" type="text/html">
+            <div>
+                <h3>Merchant's ID: {{merchId}}</h3>
+                <h3>Order Details for ID: {{_id}}</h3>
+                <p>{{detailsString}}</p>
+            </div>
+        </script>
+        
         <!--LOAD LIBRARIES-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script src="js/dashboard.js"></script>
     </body>
 </html>
+
+    <!-- alert MALLON AKYRO???? -->
+    <!-- <div class="alert-container" id="alertContainer">
+        <div class="alert">
+            <p>New Order received</p>
+            <button onclick="closeAlert()">OK</button>
+        </div>
+    </div> -->

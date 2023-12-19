@@ -1,0 +1,79 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+h1, h3 {
+    color: #333;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Orders List */
+.orders-list {
+    width: 25%; /* Adjust the width as needed */
+    background-color: #f7f7f7;
+    padding: 20px;
+    border-right: 2px solid #ddd;
+}
+
+.orders-list h3 {
+    margin-top: 0;
+}
+
+.list {
+    list-style: none;
+    padding: 0;
+}
+
+.list .order-item {
+    padding: 10px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    background-color: #fff;
+}
+
+.list .order-item:hover {
+    background-color: #e9e9e9;
+}
+
+/* Order Details */
+.order-details {
+    flex-grow: 1; /* Take the remaining space */
+    padding: 20px;
+    background-color: #fff;
+}
+
+.order-details button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.order-details button:hover {
+    background-color: #45a049;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+
+    .orders-list,
+    .order-details {
+        width: 100%;
+    }
+}

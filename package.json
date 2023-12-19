@@ -6,6 +6,7 @@
   "scripts": {
     "start": "env-cmd -f config/dev.env node src/index.js",
     "dev": "env-cmd -f config/dev.env nodemon src/index.js -e js,hbs",
+    "currencies": "env-cmd -f ./config/dev.env node src/utils/currencies.js",
     "test": "env-cmd -f ./config/test.env jest --runInBand"
   },
   "author": "",
