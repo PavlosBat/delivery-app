@@ -66,9 +66,11 @@ const convertPrice = (amount, targetCurrency) => {
             throw new Error('Unsupported currency, wrong currency name or missing exchange rate')
         }
         
-    convertedAmount = amount * rate
+    convertedAmount = parseFloat(amount * rate).toFixed(2)
+
     console.log('convertPrice return value: ', convertedAmount)//for testing
-    return parseFloat(convertedAmount.toFixed(2))
+    // return parseFloat(convertedAmount.toFixed(2))
+    return { convertedAmount, rate }
 }
     
 

@@ -93,12 +93,15 @@ const orderSchema = new mongoose.Schema({
             }
         }
     }],
-    moneyAmount: { //else without type: Number without nested objects
+    moneyAmount: {
         value:{
             type: Number
         },
         currency: {
             type: String
+        },
+        basedOnEuroRate: {
+            type: Number
         }
     },
     //??? comment if not use Stripe
@@ -140,8 +143,7 @@ orderSchema.methods.calculateTotalAmount = async function () {
             totalAmount += itemObj.item.quantity * itemObj.item.price
     }) 
     
-    //order.moneyAmount = totalAmount
-    order.moneyAmount.value = totalAmount
+    order.moneyAmount.value = parseFloat(totalAmount.toFixed(2))
     order.moneyAmount.currency = order.targetCurrency
 }
 
@@ -177,11 +179,13 @@ orderSchema.pre('save', async function(next) {
         //check if need to convert currency
         if (order.targetCurrency && order.targetCurrency !== 'EUR') {
 
-        //convert each item's price and update currency field and calculate the total amount????
+        //convert each item's price and update currency field and populate moneyAmount.basedOnEuroRate field
         for (const item of order.cart) { 
             console.log('Item before conversion:', item)//for testing
             
-            item.item.price = convertPrice(item.item.price, order.targetCurrency)
+            const { convertedAmount, rate } = convertPrice(item.item.price, order.targetCurrency)
+            item.item.price = convertedAmount
+            order.moneyAmount.basedOnEuroRate = rate
             // console.log(item.item.price)//for testing
             item.item.currency = order.targetCurrency
             // console.log(item.item.currency)//for testing
