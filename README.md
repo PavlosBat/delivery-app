@@ -115,10 +115,10 @@ for developing:
    This triggers the server to update the orders "Status" field to "Finalized" in the database which trully happens
    and then the server should send the updated activeOrders list to the clinet for render
         
-   (!!!SOS!!! the render does not happen due to unknown reasons yet,
-   although the aknowledgements and the logs of the transfer data in the server terminal are normal!!!SOS!!!)
+     (!!!SOS!!! the render does not happen due to unknown reasons yet,
+     although the aknowledgements and the logs of the transfer data in the server terminal are normal!!!SOS!!!)
 
-   "...WORKING TO RESOLVE THIS"
+     "...WORKING TO RESOLVE THIS"
 
    
         
