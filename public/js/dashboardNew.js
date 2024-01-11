@@ -2,8 +2,8 @@
 const socket = io()
 
 // LOCAL MEMORY
-let orderDetailsMap = {} //OR {}?????
-let merchantId = null //before was viewedMerchantId????
+let orderDetailsMap = {} //OR {}????? 
+let merchantId = null
 let viewedOrderId = null
 
 // TEMPLATES
@@ -52,7 +52,7 @@ function displayOrderDetails(id) {
         const detailsHtml = Mustache.render(detailsTemplate, {
             merchId: merchantId,
             _id: order._id,
-            detailsString: formatOrderDetails(order, 0) // or some other formatting function????
+            detailsString: formatOrderDetails(order, 0)
         })
 
         document.querySelector('#orderDetails').innerHTML = detailsHtml
@@ -88,9 +88,9 @@ document.addEventListener('DOMContentLoaded', () => {
     $ordersList.addEventListener('click', (event) => {
 
         if (event.target.classList.contains('order-item')) {
-            
+
             // use of the .active-order class to highlight the selected order
-            // remove the  .active-order class from the previous selected order
+            // and remove the  .active-order class from the previous selected order
             document.querySelectorAll('.order-item').forEach((item) => {
                 item.classList.remove('active-order')
             })
@@ -109,43 +109,49 @@ document.addEventListener('DOMContentLoaded', () => {
         $finalizeButton.addEventListener('click', () => {
             if (viewedOrderId && merchantId) {
                 socket.emit('finalizeOrder', { viewedOrderId, merchantId }, () => {
-                    console.log('finalizeOrder event emitted') // aknowledgement callback??????if used in server
+                    console.log('finalizeOrder event emitted')
                 })
             }
         })
     }
 })
 
-// Socket event listeners
-// Current orders for all purposes
+// SOCKET EVENT LISTENERS
+// Current orders
 socket.on('currentOrders', (data, callback) => {
-    console.log('currentOrders event received data : ', 
-        data.merchantId,
-        data.dataForList,
-        data.fullDetails
-    ) //for debugging !!!!
+
+    // console.log('currentOrders event received data : ', 
+    //     data.merchantId,
+    //     data.dataForList,
+    //     data.fullDetails
+    // )                     //for debugging !!!!
+
     updateOrdersList(data)
     callback() // aknowledgement callback
 })
 
 // New order event
 socket.on('newOrder', (data, callback) => {
-    console.log('newOrder event received data : ', 
-        data.merchantId,
-        data.dataForList,
-        data.fullDetails
-    ) //for debugging !!!!
+
+    // console.log('newOrder event received data : ', 
+    //     data.merchantId,
+    //     data.dataForList,
+    //     data.fullDetails
+    // ) //for debugging !!!!
+
     updateOrdersList(data)
     callback() // aknowledgement callback
 })
 
-// Updated orders event (after finalization) ???maybe should be for other reason too
+// Updated orders event (after finalization)
 socket.on('updateOrders', (data, callback) => {
-    console.log('updateOrders event received data : ', 
-        data.merchantId,
-        data.dataForList,
-        data.fullDetails
-    ) //for debugging !!!!
-    updateOrdersList(data)
-    callback() // aknowledgement callback
+
+    // console.log('updateOrders event received data : ', 
+    //     data.merchantId,
+    //     data.dataForList,
+    //     data.fullDetails
+    // ) //for debugging !!!!
+
+   updateOrdersList(data)
+   callback() // aknowledgement callback
 })

@@ -6,9 +6,6 @@ const bcrypt = require('bcryptjs')
 
 const {updateExchangeRates, convertPrice} = require('../utils/currencies')
 
-// 2nd way update merchant after order ???
-// const {Merchant} = require('./merchant')
-
 // Mongoose Schema for orders
 const orderSchema = new mongoose.Schema({
     shop: {
@@ -112,9 +109,6 @@ const orderSchema = new mongoose.Schema({
         type: String,
         default: 'Received and pending'
     },
-    // timeOnly: {
-    //     type: Number //or Date ???? need to use it for activeOrders??????
-    // },
     tokens: [{
         token: {
             type: String,
@@ -211,16 +205,6 @@ orderSchema.pre('save', async function(next) {
         throw new Error('Error calculating total order money amount')
     }
 })
-
-// 2nd way to update Merchant to store the new order in his orders field (1st in order .post)
-// orderSchema.post('save', async function() {
-//     const order = this
-//     try {
-//         await Merchant.findByIdAndUpdate(order.shop, { $push: { orders: order._id } })
-//     } catch (e) {
-//         console.error('Error updating Merchant with new order', e)
-//     }
-// })
 
 // Create model from schema
 const Order = mongoose.model('Order', orderSchema)

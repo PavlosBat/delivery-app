@@ -96,105 +96,6 @@ const merchantSchema = new mongoose.Schema({
                 default: "EUR" 
             }
         }
-        // Starters: [{
-        //     name: {
-        //         type: String,
-        //         required: true
-        //     },
-        //     description: {
-        //         type: String,
-        //         required: true
-        //     },
-        //     quantity: {
-        //         type: Number,
-        //         required: true
-        //     },
-        //     price: {
-        //         value: {
-        //             type: Number,
-        //             required: true
-        //         },
-        //         currency: {
-        //             type: String,
-        //             required: true
-        //         }
-        //     }
-        // }],
-        // Mains: [{
-        //     name: {
-        //         type: String,
-        //         required: true,
-        //         trim: true
-        //     },
-        //     description: {
-        //         type: String,
-        //         required: true
-        //     },
-        //     quantity: {
-        //         type: Number,
-        //         required: true
-        //     },
-        //     price: {
-        //         value: {
-        //             type: Number,
-        //             required: true
-        //         },
-        //         currency: {
-        //             type: String,
-        //             required: true
-        //         }
-        //     }
-        // }],
-        // Deserts: [{
-        //     name: {
-        //         type: String,
-        //         required: true,
-        //         trim: true
-        //     },
-        //     description: {
-        //         type: String,
-        //         required: true
-        //     },
-        //     quantity: {
-        //         type: Number,
-        //         required: true
-        //     },
-        //     price: {
-        //         value: {
-        //             type: Number,
-        //             required: true
-        //         },
-        //         currency: {
-        //             type: String,
-        //             required: true
-        //         }
-        //     }
-        // }],
-        // Drinks: [{
-        //     name: {
-        //         type: String,
-        //         required: true,
-        //         trim: true
-        //     },
-        //     description: {
-        //         type: String,
-        //         required: true
-        //     },
-        //     quantity: {
-        //         type: Number,
-        //         required: true
-        //     },
-        //     price: {
-        //         value: {
-        //             type: Number,
-        //             required: true
-        //         },
-        //         currency: {
-        //             type: String,
-        //             required: true
-        //         }
-        //     }
-        // }]
     }],
     orders: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -221,7 +122,7 @@ const merchantSchema = new mongoose.Schema({
     timestamps: true
 })
 
-// Virtual Populate Orders ???other fields also??? +explanation???
+// Virtual Populate Orders
 merchantSchema.virtual('ordersList', {
     ref: 'Order',
     localField: '_id',
@@ -257,7 +158,7 @@ merchantSchema.methods.generateAuthToken = async function() {
 merchantSchema.statics.findByCredentials = async (email, password) => {
     const merchant = await Merchant.findOne({ email })
     
-    //error check no clear feedback for safety reasons
+    //error check with no clear feedback for safety reasons
     if (!merchant) {
         throw new Error('Unable to login')
     }
