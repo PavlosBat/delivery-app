@@ -124,9 +124,9 @@ for developing:
         
 11) If we create a new order all the server side job is done again properly +the new order is
     created in the database, except that the new order is not added in the rendered list on the browser,
-         unless we login again (!!!SOS!!!)
+    unless we login again (!!!SOS!!!)
 
-           "...WORKING TO RESOLVE THIS ALSO"
+    "...WORKING TO RESOLVE THIS ALSO"
 
     
 
