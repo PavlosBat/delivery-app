@@ -1,23 +1,36 @@
 
 DELIVERY APP (task from DESQUARED)
 
+
+
 USAGE:
 
 for developing:
   1) Open one terminal and connect to mongodb server:
      > /Users/"userName"/mongodb/bin/mongod.exe --dbpath="your/path"
 
+
+
   2) Open second terminal and in project directory:
      > npm run dev
 
+
+     
   3) Open web browser tab and in url type:
      htpp://localhost:3000
 
-  4) In other web browser tab add the link:
+     
+
+  5) In other web browser tab add the link:
      https://pavlos-desquared.postman.co/workspace/83c65b9a-bb8f-4532-b846-e3f2e86596b6
 
-  5) Inside Postman:
-    a) Create a merchant (there is a saved one for convinience)
+     
+
+  6) Inside Postman:
+
+
+    a) Create a merchant (there is a saved one for convinience):
+    
         {
           "name": "amerch",
           "email": "amerch@gmail.com",
@@ -48,12 +61,17 @@ for developing:
               }
           ]
       }
+
+     
     b) Login the merchant (in body you can wright the email and password for authentication)
       {
         "email": "amerch@gmail.com",
         "password": "amerch12!"
       }
-    c) Create an order for the merchant we created ( "shop" field must have the _id of an existing merchant)
+
+     
+    c) Create an order for the merchant we created ( "shop" field must have the _id of an existing merchant):
+    
       {
         "shop": "COPY FROM THE MERCHANT YOU CREATED ABOVE",
         "email": "pavlos@gmail.com",
@@ -84,11 +102,16 @@ for developing:
         }]
       }
 
+
 7) When we login a new merchant in the browser we can see the order list rendered
-     
+
+
+   
 8) We can click fro order list to see it's full details on the side
+
+
       
-9) When the order is ready and leaves the store the merchand hits the "Finalize Order" button...
+10) When the order is ready and leaves the store the merchand hits the "Finalize Order" button...
    This triggers the server to update the orders "Status" field to "Finalized" in the database which trully happens
    and then the server should send the updated activeOrders list to the clinet for render
         
@@ -96,6 +119,8 @@ for developing:
    although the aknowledgements and the logs of the transfer data in the server terminal are normal!!!SOS!!!)
 
    "...WORKING TO RESOLVE THIS"
+
+   
         
 11) If we create a new order all the server side job is done again properly +the new order is
     created in the database, except that the new order is not added in the rendered list on the browser,
@@ -103,5 +128,7 @@ for developing:
 
            "...WORKING TO RESOLVE THIS ALSO"
 
-     13) I created a test db for testing with yest but the test.merchant.js & test.order.js files are not yet ready
-         "STILL WORKING ON IT"
+    
+
+13) I created a test db for testing with yest but the test.merchant.js & test.order.js files are not yet ready
+    "STILL WORKING ON IT"
