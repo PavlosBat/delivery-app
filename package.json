@@ -15,17 +15,18 @@
     "bcryptjs": "^2.4.3",
     "express": "^4.18.2",
     "fast-two-sms": "^3.0.0",
-    "jest": "^29.5.0",
     "jsonwebtoken": "^9.0.0",
     "mongodb": "^5.1.0",
     "mongoose": "^7.0.2",
     "multer": "^1.4.5-lts.1",
-    "sharp": "^0.31.3",
+    "sharp": "^0.33.1",
     "socket.io": "^4.7.2",
     "validator": "^13.9.0"
   },
   "devDependencies": {
     "env-cmd": "^10.1.0",
-    "nodemon": "^2.0.22"
+    "jest": "^29.7.0",
+    "nodemon": "^2.0.22",
+    "supertest": "^6.3.3"
   }
 }

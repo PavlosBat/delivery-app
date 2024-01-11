@@ -3,12 +3,12 @@ const socket = io()
 
 //LOCAL MEMORY
 let orderDetailsMap = {}
-let merchantId = null
+let viewedMerchantId = null //before was merchantId????
 let viewedOrderId = null
 
 //ELEMENTS
 //check again button?????
-const $finalizeButton = document.querySelector('#button')
+// const $finalizeButton = document.querySelector('#finalizeButton')
 const $clickItem = document.querySelectorAll('.order-item')
 
 //TEMPLATES
@@ -17,30 +17,51 @@ const detailsTemplate = document.querySelector('#order-details-template').innerH
 
 //FUNCTIONS
 //F1.Convert Order Details to String ??? OR FROM ACTIVE ORDERS FILE?????????
-function orderDetailsToString (order) { 
-    return order.toString()
-}
+//Is convertion needed for rendering????? 
+// function orderDetailsToString (order) { 
+//     return order.toString()
+// }
 
 //F2.Display Order Details ΝΑ ΒΑΛΩ ΤΟΝ ΜΕΡΤΣΑΝΤ???? Ή ΟΧΙ???
+
+//In displayOrderDetails() I want to store in a variable the current orderId and merchantId 
+//so when I click on finalize button I can emit the event to the server 
+//with the correct room identifier (merchantId) and orderId for deletion
 function displayOrderDetails (id, merchantId) {
     const order = orderDetailsMap[id]
     if (order) {
-        // currentOrderId = order._id  ????not needed???
+        viewedOrderId = order._id
+        viewedMerchantId = merchantId
         const detailsHtml = Mustache.render(detailsTemplate, {
             merchId: merchantId, //keys are named as variables e.g. {{merchId}} used in Mustache
             _id: order._id, 
-            detailsString: orderDetailsToString(order) 
+            detailsString: order
+            // detailsString: orderDetailsToString(order) 
         })
         document.querySelector('#orderDetails').innerHTML = detailsHtml
     }
 }
 
+
+// function displayOrderDetails (id, merchantId) {
+//     const order = orderDetailsMap[id]
+//     if (order) {
+//         // currentOrderId = order._id  ????not needed???
+//         const detailsHtml = Mustache.render(detailsTemplate, {
+//             merchId: merchantId, //keys are named as variables e.g. {{merchId}} used in Mustache
+//             _id: order._id, 
+//             detailsString: orderDetailsToString(order) 
+//         })
+//         document.querySelector('#orderDetails').innerHTML = detailsHtml
+//     }
+// }
+
 //F3.Click on List Items Event Listener ΝΑ ΒΑΛΩ ΤΟΝ ΜΕΡΤΣΑΝΤ??? ΚΑΙ ΜΕΤΑ???
-function attachClickEventToOrderList (merchantId) {
+function attachClickEventToOrderList (merchant) {
     $clickItem.forEach((item) => {
         item.addEventListener('click', (event) => {
             const orderId = event.target.dataset.orderId
-            displayOrderDetails(orderId, merchantId)
+            displayOrderDetails(orderId, merchant)
         })
     })
 }
@@ -50,18 +71,18 @@ function attachClickEventToOrderList (merchantId) {
 socket.on('currentOrders', (data) => {
 
     //store merchantId for room identifier????OK??
-    merchantId = data.merchantId
-
-    //render sidebar
-    const html = Mustache.render(sidebarTemplate, {dataforList: data.dataForList}) //key is named as variable {{dataForList}} used in Mustache
-    document.querySelector('#ordersList').innerHTML = html
-
+    const merchantId = data.merchantId
+    
     //store order details 
     data.fullDetails.forEach(order => {
         orderDetailsMap[order._id] = order
     })
 
-    //click event in every order list item
+    //render sidebar
+    const html = Mustache.render(sidebarTemplate, {dataforList: data.dataForList}) //key is named as variable {{dataForList}} used in Mustache
+    document.querySelector('#ordersList').innerHTML = html
+
+    //click event for every list item (merchantId passed for room identifier in socket.emit('finalizeOrder'))
     attachClickEventToOrderList(merchantId)
 })
 
@@ -70,60 +91,55 @@ socket.on('newOrder', (data) => {
     console.log("New order received")
 
     //store merchantId for room identifier????OK??
-    merchantId = data.merchantId
+    const merchantId = data.merchantId
+    
+    //store order details
+    data.fullDetails.forEach(order => {
+        orderDetailsMap[order._id] = order
+    })
 
     //render sidebar
     const html = Mustache.render(sidebarTemplate, {dataForList: data.dataForList}) //key is named as variable {{dataForList}} used in Mustache
     document.querySelector('#ordersList').innerHTML = html
 
+    //click event in every order list item
+    attachClickEventToOrderList(merchantId)
+})
+
+//Listen for Updated Orders afterthe finalization of an order
+socket.on('updatedOrders', (data) => {
+    console.log("Updated orders received")
+
+    //store merchantId for room identifier????OK??
+    const merchantId = data.merchantId
+    
     //store order details
     data.fullDetails.forEach(order => {
         orderDetailsMap[order._id] = order
     })
+
+    //render sidebar
+    const html = Mustache.render(sidebarTemplate, {dataForList: data.dataForList}) //key is named as variable {{dataForList}} used in Mustache
+    document.querySelector('#ordersList').innerHTML = html
+
     //click event in every order list item
     attachClickEventToOrderList(merchantId)
 })
 
 //Emit order finalization (from button) to server (where removal will take place and updated list will be sent back)
-$finalizeButton.addEventListener('click', () => {
-    if (viewedOrderId && merchantId) {
-        socket.emit('finalizeOrder', {viewedOrderId, merchantId})
+document.addEventListener('DOMContentLoaded', () => {
+    const $finalizeButton = document.querySelector('#finalizeButton')
+
+    // Check if the button exists to avoid null reference errors
+    if ($finalizeButton) {
+
+        $finalizeButton.addEventListener('click', () => {   
+            if (viewedOrderId && viewedMerchantId) {
+                socket.emit('finalizeOrder', {viewedOrderId, viewedMerchantId}) //test if room identifier needed????
+            }
+        })
     }
 })
-
-
-
-//FUNCTIONS FOR ORDERS
-// function showNewOrderAlert() {
-//     const alertContainer = document.getElementById('alertContainer');
-//     alertContainer.style.display = 'flex';
-// }
-
-// function closeAlert() {
-//     const alertContainer = document.getElementById('alertContainer');
-//     alertContainer.style.display = 'none';
-// }
-
-// function addOrderToList(order) {
-//     const ordersList = document.getElementById('ordersList');
-//     const orderDiv = document.createElement('div');
-//     orderDiv.innerHTML = `Order ID: ${order._id}`;
-//     orderDiv.onclick = () => showOrderDetails(order);
-//     ordersList.appendChild(orderDiv);
-// }
-
-// function showOrderDetails(order) {
-//     const orderDetails = document.getElementById('orderDetails');
-//     orderDetails.innerHTML = `<p>Order ID: ${order._id}</p><button onclick="finalizeOrder('${order._id}')">Finalize Order</button>`;
-// }
-
-// //????
-// function finalizeOrder(orderId) {
-//     // Implement the logic to update the order status and remove it from the list
-//     console.log('Finalizing order:', orderId);
-// }
-
-
 
 //location Example
 // document.querySelector('#send-location').addEventListener('click', () => {

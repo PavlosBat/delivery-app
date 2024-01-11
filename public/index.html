@@ -8,7 +8,7 @@
         <h1>Merchant Dashboard</h1>
 
         <!--LOAD CSS styles & icon-->
-        <link rel="stylesheet" href="css/dashboard1.css">
+        <link rel="stylesheet" href="css/dashboard.css">
         <!-- <link rel="stylesheet" href="css/styles.css"> -->
     </head>
 
@@ -19,9 +19,11 @@
         <div class="dashboard-container">
             <div class="orders-list" id="ordersList">
                 <h3>Order list (active):</h3>
+                <div id="ordersListContainer"></div>
             </div>
 
-            <div class="order-details" id="orderDetails">
+            <div class="order-details" id="orderDetailsContainer">
+                <div id="orderDetails"></div>
                 <button id="finalizeButton">Finalize Order</button>
             </div>
         </div>
@@ -40,22 +42,28 @@
         <script id="order-details-template" type="text/html">
             <div>
                 <h3>Merchant's ID: {{merchId}}</h3>
-                <h3>Order Details for ID: {{_id}}</h3>
-                <p>{{detailsString}}</p>
+                <h3>Order ID: {{_id}}</h3>
+                <div id="order-details">
+                    {{{detailsString}}}
+                </div>
             </div>
         </script>
         
         <!--LOAD LIBRARIES-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
-        <script src="js/dashboard.js"></script>
+        <script src="js/dashboardNew.js"></script>
     </body>
 </html>
 
-    <!-- alert MALLON AKYRO???? -->
-    <!-- <div class="alert-container" id="alertContainer">
-        <div class="alert">
-            <p>New Order received</p>
-            <button onclick="closeAlert()">OK</button>
-        </div>
-    </div> -->
+<!-- CONTAINERS -->
+        <!--Create containers (divs) to make a nice layout-->
+        <!-- <div class="dashboard-container">
+            <div class="orders-list" id="ordersList">
+                <h3>Order list (active):</h3>
+            </div>
+
+            <div class="order-details" id="orderDetails">
+                <button id="finalizeButton">Finalize Order</button>
+            </div>
+        </div> -->

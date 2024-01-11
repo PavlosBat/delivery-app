@@ -4,26 +4,29 @@ const { Merchant } = require('../models/merchant')
 const authOrder = require('../middleware/authOrder')
 const router = new express.Router()
 
-//Create order OK!!! BUT NEEDS PAYMENT???
+// Create order OK!!! 
 router.post('/orders', async (req, res) => {
     const order = new Order(req.body)
 
     try {
-        //'shop' (Merchant _id) field validation
+        // 'shop' (Merchant _id) existance validation
         const merchantExists = await Merchant.exists({ _id: order.shop})
         if (!merchantExists) {
             return res.status(404).send({Error: 'Merchant not found'})
         }
 
-        //save order to database
-        await order.save()
-        
-        //Node.js EventEmit newOrder in merchant dashboard 
+        // Node.js EventEmit newOrder in merchant dashboard
         orderEventEmitter.emit('order', order)
         
+        // Generate JWToken for Authorization (Middleware)
         const token = await order.generateAuthToken()
 
-        //1st way of updating Merchant to store order in orders field !!! 2nd by middleware in order schema???
+        // +++++++++++ADD email response!!!!
+
+        // save order to database !!!without token (security)
+        await order.save()
+
+        // updating Merchant to store order in his orders field
         await Merchant.findByIdAndUpdate(order.shop, { $push: { orders: order._id } })
 
         res.status(201).send( {order, token} )
@@ -32,7 +35,7 @@ router.post('/orders', async (req, res) => {
     }
 })
 
-//Read Order OK
+// Read Order OK
 router.get('/orders/myOrder', authOrder, async (req, res) => {
     try {
         if (!req.order) {
@@ -45,9 +48,10 @@ router.get('/orders/myOrder', authOrder, async (req, res) => {
     }
 })
 
-//Update Order OK???
+// Update Order OK???
 router.patch('/orders/myOrder', authOrder, async (req, res) => {
-//time cap of 3min after orders 1st storage
+
+    //++++ timecap 3min after order creation to be able to change order details!!!!!
 
     const updates = Object.keys(req.body)
     const allowedUpdates = ['phone','city','street', 'number', 'postalCode', 'ringBellName', 'cart']

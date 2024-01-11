@@ -81,7 +81,7 @@ const merchantSchema = new mongoose.Schema({
             type: String,
             required: true
         },
-        quantity: {
+        stock: {
             type: Number,
             required: true
         },

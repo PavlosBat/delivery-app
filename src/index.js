@@ -1,17 +1,27 @@
-//External Modules
+// External Modules
 const http = require('http')
-const app = require('./app')
 const socketio = require('socket.io')
+const app = require('./app')
 
-//Internal Modules
-const {addActiveOrder, removeActiveOrder, getActiveOrdersForMerchant, sanitizeList} = require('./utils/activeOrdersNEW')//check folder!!!!
-const {orderEventEmitter} = require('./models/order')
+// Internal Modules
+const { fetchOrders,
+    addActiveOrder,
+    removeActiveOrder,
+    getActiveOrdersForMerchant,
+    sanitizeList } = require('./utils/activeOrdersAll') // 1WAY 
+
+// const {addActiveOrder, 
+//     removeActiveOrder,
+//     getActiveOrdersForMerchant,
+//     sanitizeList} = require('./utils/activeOrdersNEW') // 2WAY
+
+const {orderEventEmitter, Order} = require('./models/order')
 const {merchantLoginEventEmitter} = require('./models/merchant')
 
-//Port
+// Port
 const port = process.env.PORT || 3000
 
-//Modifying express API to be able to connect with 
+// Modifying express API to be able to connect with 
 const httpServer = http.createServer(app)
 const io = socketio(httpServer)
 
@@ -19,78 +29,103 @@ const io = socketio(httpServer)
 io.on('connection', (socket) => {
     console.log('New WebSocket connection established')
     
-    merchantLoginEventEmitter.on('merchantLogin', (merchantId) => {
+    merchantLoginEventEmitter.on('merchantLogin', async (merchantId) => { //be sure about async????
+        console.log('merchantLogin event emitted')//for debugging!!!!
         
-        //Create room based on merchantId 
+        // Create room based on merchantId 
         socket.join(merchantId)
+        console.log('Room created for merchantId:', merchantId)//for debugging!!!!
 
-        //Sanitize order data only for significant merchant and get dashboard list with less data
-        const activeOrdersForMerchant = getActiveOrdersForMerchant(merchantId)
+        // Fetch current active orders from db
+        await fetchOrders() 
+
+        // Sanitize order data only for significant merchant and get dashboard list with less data
+        const activeOrdersForMerchant = getActiveOrdersForMerchant(merchantId) //added await to test????
+        // console.log('activeOrdersForMerchant after login:', activeOrdersForMerchant)//for debugging!!!!
         const dataForList = sanitizeList(activeOrdersForMerchant)
+        // console.log('dataForList after login:', dataForList)//for debugging!!!!
 
-        //Send active orders list for rendering
+        // Send CURRENT active orders list and full details for rendering
         io.to(merchantId).emit('currentOrders', {
             merchantId,
             dataForList,
             fullDetails: activeOrdersForMerchant
+        }, () => {
+            console.log('currentOrders event emitted') // aknowledgement callback
         })
     })
 
-    //Listen when order is finalized to remove it from active orders and change it's status????
-    socket.on('finalizeOrder', async (data) => {
+    // orderEventEmitter Listener => emit (Socket.io room) to Client(merchants.js)
+    orderEventEmitter.on('order', async (order) => {
 
-        //Retrieve merchantId and orderId for deletion
-        const merchantId = data.merchantId
-        const orderId = data.viewedOrderId
+        // fetch current active orders from db ????if needed???
+        await fetchOrders()
+            
+        // Add new order to active orders (returns error if exists)
+        const newOrder = addActiveOrder(order)
+        console.log('New order added to active orders:', newOrder)//for debugging!!!! 
 
-        //update order status in database??? declare function...
-        await updateOrderStatusDatabase(orderId, 'Finalized')
-
-        //remove order from active orders array
-        removeActiveOrder(orderId)
-
-        //get updated active order list for significant merchant and get dashboard list
+        // Take the merchantId to use it as room key
+        const merchantId = order.shop
+        
+        // Sanitize order data only for significant merchant and make get for dashboard list less data
         const activeOrdersForMerchant = getActiveOrdersForMerchant(merchantId)
+        console.log('activeOrdersForMerchant after new order:', activeOrdersForMerchant)//for debugging!!!!
         const dataForList = sanitizeList(activeOrdersForMerchant)
-
-        //emit the updated active orders to the merchant
-        io.to(merchantId).emit('update', {
+        console.log('dataForList after new order:', dataForList)//for debugging!!!!
+        
+        // Emit updated active orders list to specific merchant
+        io.to(merchantId).emit('newOrder', {
             merchantId,
             dataForList,
             fullDetails: activeOrdersForMerchant
+        }, () => {
+            console.log('newOrder event emitted') // aknowledgement callback
         })
-
     })
-    
-    //Merchant socket disconnection
+
+    // Listen when order is finalized to remove it from active orders and change it's status????
+    socket.on('finalizeOrder', async (data, callback) => {
+        callback() // aknowledgement callback
+
+        // retrieve merchantId and orderId for deletion
+        // const merchantId = data.merchantId
+        // console.log('merchantId from :', merchantId)//for debugging!!!!
+        const orderId = data.viewedOrderId
+        // console.log('orderId after finalize :', orderId)//for debugging!!!!
+
+        // update in the database the field status of the order to 'Finalized'
+        await Order.findOneAndUpdate({ _id: orderId }, { status: 'Finalized' })
+
+        //remove order from cached active orders array
+        await fetchOrders()
+        // removeActiveOrder(orderId)
+
+        // get updated active order list for significant merchant and get dashboard list
+        const activeOrdersForMerchant = getActiveOrdersForMerchant(data.merchantId)
+        // console.log('activeOrdersForMerchant after finalize :', activeOrdersForMerchant)//for debugging!!!!
+        const dataForList = sanitizeList(activeOrdersForMerchant)
+        // console.log('dataForList after finalize :', dataForList)//for debugging!!!!
+
+        // emit the updated active orders to the merchant
+        io.to(data.merchantId).emit('updateOrders', {
+            merchantId: data.merchantId,
+            dataForList,
+            fullDetails: activeOrdersForMerchant
+        }, () => {
+            console.log('updateOrders event emitted') // aknowledgement callback
+        })
+    })
+
+    // Merchant socket disconnection
     socket.on('disconnect', () => {
         console.log('WebSocket Connection terminated')
     })
 })
 
 
-//orderEventEmitter Listener => emit (Socket.io room) to Client(merchants.js)
-orderEventEmitter.on('newOrder', (order) => {
-    
-    //Add new order to active orders (returns error if exists)
-    const newOrder = addActiveOrder(order)
 
-    //Take the merchantId to use it as room key
-    const merchantId = newOrder.shop
-    
-    //Sanitize order data only for significant merchant and make get for dashboard list less data
-    const activeOrdersForMerchant = getActiveOrdersForMerchant(merchantId)
-    const dataForList = sanitizeList(activeOrdersForMerchant)
-    
-    //Emit updated active orders list to specific merchant
-    io.to(merchantId).emit('newOrder', {
-        merchantId,
-        dataForList,
-        fullDetails: activeOrdersForMerchant
-    })
-})
-
-//Server call
+// Server call
 httpServer.listen(port, () => {
     console.log(`Server is up on port ${port}`)
 })
@@ -108,38 +143,4 @@ httpServer.listen(port, () => {
 //                 console.log('WebSocket Connection terminated')
 //         })
 //     })
-// })
-
-//GIA DOKIMES !!!
-// const Merchant = require('./models/merchant')
-
-//EXAMPLE//
-// const pet = {
-    //     name: 'Hal'
-    // }
-    
-    // pet.toJSON = function () {
-        //     console.log(this)
-        //     return this
-// }
-
-// console.log(JSON.stringify(pet))
-
-// app.post('/merchants', async(req, res) => {
-//     const postData = new Merchant({
-//         name: 'Burger',
-//         email: 'burger@gmail.com',
-//         password: 'burger12!',
-//         menu: {
-//             Starters: [{
-//                 name: 'salata',
-//                 description: 'aggouri, domata',
-//                 price: {
-//                     value: 4.00,
-//                     currency: 'euro'
-//                 }
-//             }]
-//         }
-//     })
-//     await new Merchant(merchant1).save()
 // })

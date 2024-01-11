@@ -1,6 +1,6 @@
 const express = require('express')
 const multer = require('multer')
-const sharp = require('sharp')
+// const sharp = require('sharp')????
 // const { update } = require('../models/merchant')
 const { Merchant, merchantLoginEventEmitter } = require('../models/merchant')
 const authMerch = require('../middleware/authMerch')
@@ -19,7 +19,7 @@ const router = new express.Router()
 //     }
 // })
 
-//1.Create new ADMIN Merchant or Merchant...????
+//1.Create new Merchant...????
 router.post('/merchants', async(req, res) => {
     const merchant = new Merchant(req.body)
 
