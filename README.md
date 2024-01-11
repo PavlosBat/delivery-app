@@ -4,16 +4,16 @@ DELIVERY APP (task from DESQUARED)
 USAGE:
 
 for developing:
-  1) open one terminal and connect to mongodb server:
+  1) Open one terminal and connect to mongodb server:
      > /Users/"userName"/mongodb/bin/mongod.exe --dbpath="your/path"
 
-  2) open second terminal and in project directory:
+  2) Open second terminal and in project directory:
      > npm run dev
 
-  3) open web browser tab and in url type:
+  3) Open web browser tab and in url type:
      htpp://localhost:3000
 
-  4) in other web browser tab add the link:
+  4) In other web browser tab add the link:
      https://pavlos-desquared.postman.co/workspace/83c65b9a-bb8f-4532-b846-e3f2e86596b6
 
   5) Inside Postman:
@@ -84,21 +84,21 @@ for developing:
         }]
       }
 
-     7) when we login a new merchant in the browser we can see the order list rendered
+7) When we login a new merchant in the browser we can see the order list rendered
      
-     8) we can click fro order list to see it's full details on the side
+8) We can click fro order list to see it's full details on the side
       
-     9) and when the order is ready and leaves the store the merchand hits the "Finalize Order" button...
-        This triggers the server to update the orders "Status" field to "Finalized" in the database which trully happens
-        and then the server should send the updated activeOrders list to the clinet for render
+9) When the order is ready and leaves the store the merchand hits the "Finalize Order" button...
+   This triggers the server to update the orders "Status" field to "Finalized" in the database which trully happens
+   and then the server should send the updated activeOrders list to the clinet for render
         
-        (!!!SOS!!! the render does not happen due to unknown reasons yet,
-        although the aknowledgements and the logs of the transfer data in the server terminal are normal!!!SOS!!!)
+   (!!!SOS!!! the render does not happen due to unknown reasons yet,
+   although the aknowledgements and the logs of the transfer data in the server terminal are normal!!!SOS!!!)
 
-          "...WORKING TO RESOLVE THIS"
+   "...WORKING TO RESOLVE THIS"
         
-     11) if we create a new order all the server side job is done again properly +the new order is
-         created in the database, except that the new order is not added in the rendered list on the browser,
+11) If we create a new order all the server side job is done again properly +the new order is
+    created in the database, except that the new order is not added in the rendered list on the browser,
          unless we login again (!!!SOS!!!)
 
            "...WORKING TO RESOLVE THIS ALSO"
