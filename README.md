@@ -1,22 +1,38 @@
 
 DELIVERY APP (task from DESQUARED)
 
-
+Built with JS (commonJS) : 
+    back-end: Node.js, Express.js framework for REST API, MongoDB database with Mongoose library
+    front-end: HTML, CSS, Socket.io for web-sockets live communication with server
+    third party APIs: fixer.io (currency rates) , Twilio SendGrid (emails) !!!KEYS NEEDED FOR BOTH !!!
+    testing: Postman, Jest
+    
 
 USAGE:
 
-for developing:
-  1) Open one terminal and connect to mongodb server:
+A) For use in dev environment:
+  1) Create a dev.env file to store the below key value pairs:
+      PORT=3000
+      MONGOOSE_URI=mongodb://127.0.0.1:27017/delivery-app-api
+      FIXER_API_KEY= your fixer API key
+      JWT_SECRET_MERCHANT=mySecret1
+      JWT_SECRET_ADMIN=mySecret2
+      JWT_SECRET_ORDER=mySecret3
+      SENDGRID_API_KEY= your sendgrid API key
+    
+
+  
+  2) Open one terminal and connect to mongodb server:
      > /Users/"userName"/mongodb/bin/mongod.exe --dbpath="your/path"
 
 
 
-  2) Open second terminal and in project directory:
+  3) Open second terminal and in project directory:
      > npm run dev
 
 
      
-  3) Open web browser tab and in url type:
+  4) Open web browser tab and in url type:
      htpp://localhost:3000
 
      
