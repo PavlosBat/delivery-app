@@ -2,10 +2,11 @@
 DELIVERY APP (task from DESQUARED)
 
 Built with JS (commonJS) : 
-    back-end: Node.js, Express.js framework for REST API, MongoDB database with Mongoose library
-    front-end: HTML, CSS, Socket.io for web-sockets live communication with server
-    third party APIs: fixer.io (currency rates) , Twilio SendGrid (emails) !!!KEYS NEEDED FOR BOTH !!!
-    testing: Postman, Jest
+
+    Back-end: Node.js, Express.js framework for REST API, MongoDB database with Mongoose library
+    Front-end: HTML, CSS, Socket.io for web-sockets live communication with server
+    Third party APIs: fixer.io (currency rates) , Twilio SendGrid (emails) !!!KEYS NEEDED FOR BOTH !!!
+    Testing: Postman, Jest
     
 
 USAGE:
