@@ -17,13 +17,19 @@ USAGE:
 A) For use in dev environment:
   1) Create a dev.env file to store the below key value pairs:
 
-      PORT=3000
-      MONGOOSE_URI=mongodb://127.0.0.1:27017/delivery-app-api
-      FIXER_API_KEY= your fixer API key
-      JWT_SECRET_MERCHANT=mySecret1
-      JWT_SECRET_ADMIN=mySecret2
-      JWT_SECRET_ORDER=mySecret3
-      SENDGRID_API_KEY= your sendgrid API key
+          PORT=3000
+     
+          MONGOOSE_URI=mongodb://127.0.0.1:27017/delivery-app-api
+     
+          FIXER_API_KEY= your fixer API key
+     
+          JWT_SECRET_MERCHANT=mySecret1
+     
+          JWT_SECRET_ADMIN=mySecret2
+     
+          JWT_SECRET_ORDER=mySecret3
+     
+          SENDGRID_API_KEY= your sendgrid API key
     
 
   
