@@ -4,8 +4,11 @@ DELIVERY APP (task from DESQUARED)
 Built with JS (commonJS) : 
 
     Back-end: Node.js, Express.js framework for REST API, MongoDB database with Mongoose library
+    
     Front-end: HTML, CSS, Socket.io for web-sockets live communication with server
+    
     Third party APIs: fixer.io (currency rates) , Twilio SendGrid (emails) !!!KEYS NEEDED FOR BOTH !!!
+    
     Testing: Postman, Jest
     
 
@@ -13,6 +16,7 @@ USAGE:
 
 A) For use in dev environment:
   1) Create a dev.env file to store the below key value pairs:
+
       PORT=3000
       MONGOOSE_URI=mongodb://127.0.0.1:27017/delivery-app-api
       FIXER_API_KEY= your fixer API key
@@ -23,27 +27,27 @@ A) For use in dev environment:
     
 
   
-  2) Open one terminal and connect to mongodb server:
+  3) Open one terminal and connect to mongodb server:
      > /Users/"userName"/mongodb/bin/mongod.exe --dbpath="your/path"
 
 
 
-  3) Open second terminal and in project directory:
+  4) Open second terminal and in project directory:
      > npm run dev
 
 
      
-  4) Open web browser tab and in url type:
+  5) Open web browser tab and in url type:
      htpp://localhost:3000
 
      
 
-  5) In other web browser tab add the link:
+  6) In other web browser tab add the link:
      https://pavlos-desquared.postman.co/workspace/83c65b9a-bb8f-4532-b846-e3f2e86596b6
 
      
 
-  6) Inside Postman:
+  7) Inside Postman:
 
 
     a) Create a merchant (there is a saved one for convinience):
