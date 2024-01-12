@@ -1,7 +1,13 @@
 const express = require('express')
+
 const { Order, orderEventEmitter } = require('../models/order')
 const { Merchant } = require('../models/merchant')
 const authOrder = require('../middleware/authOrder')
+const { sendOrderConfirmationEmail,
+    sendOrderUpdateEmail,
+    sendOrderCancelationEmail } = require('../email/account')
+
+// Initiate express router
 const router = new express.Router()
 
 // Create order OK!!! 
@@ -18,13 +24,14 @@ router.post('/orders', async (req, res) => {
         // Node.js EventEmit newOrder in merchant dashboard
         orderEventEmitter.emit('order', order)
         
-        // Generate JWToken for Authorization (Middleware)
+        // Generate JWToken for Authorization (It does NOT save the order !)
         const token = await order.generateAuthToken()
-
-        // +++++++++++ADD email response!!!!
 
         // save order to database !!!without token (security)
         await order.save()
+        
+        // automated email for updating Order !!!COMMENT IN DEV MODE unless it is mocked!!! 
+        // sendOrderConfirmationEmail(order.email, order.ringBellName, order.shop)
 
         // updating Merchant to store order in his orders field
         await Merchant.findByIdAndUpdate(order.shop, { $push: { orders: order._id } })
@@ -64,6 +71,10 @@ router.patch('/orders/myOrder', authOrder, async (req, res) => {
     try {
         updates.forEach((update) => req.order[update] = req.body[update])
         await req.order.save()
+
+        // // automated email for new Order !!!COMMENT IN DEV MODE unless it is mocked!!! 
+        // sendOrderUpdateEmail(order.email, order.ringBellName, order.shop)
+
         res.send(req.order)
     } catch (e) {
         res.status(500).send()
@@ -75,6 +86,10 @@ router.delete('/orders/myOrder', authOrder, async (req, res) => {
     //???????????????time cap of 2min or + autocancel if payment fails
     try {
         await req.order.deleteOne()
+
+        // automated email for deleting Order !!!COMMENT IN DEV MODE unless it is mocked!!! 
+        // sendOrderCancelationEmail(order.email, order.ringBellName, order.shop)
+
         res.send(req.order)
     } catch (e) {
         res.status(500).send({Error: e.message})

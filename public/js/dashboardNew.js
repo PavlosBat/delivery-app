@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const orderId = event.target.dataset.orderId
             displayOrderDetails(orderId)
         }
-    });
+    })
 
     // Finalization button event listener
     if ($finalizeButton) {

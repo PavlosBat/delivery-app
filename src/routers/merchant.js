@@ -4,20 +4,12 @@ const multer = require('multer')
 // const { update } = require('../models/merchant')
 const { Merchant, merchantLoginEventEmitter } = require('../models/merchant')
 const authMerch = require('../middleware/authMerch')
+const { sendMerchantCreationEmail,
+    sendMerchantUpdateEmail,
+    sendMerchantDeletionEmail } = require('../email/account')
+
+// Initiate express router
 const router = new express.Router()
-
-// //1.Create new Merchant or ADMIN Merchant...OK
-// router.post('/merchants', async(req, res) => {
-//     const merchant = new Merchant(req.body)
-
-//     try {
-//         await merchant.save()
-//         const token = await merchant.generateAuthToken()
-//         res.status(201).send( {merchant, token} )
-//     } catch (e) {
-//         res.status(400).send()
-//     }
-// })
 
 //1.Create new Merchant...????
 router.post('/merchants', async(req, res) => {
@@ -25,7 +17,13 @@ router.post('/merchants', async(req, res) => {
 
     try {
         await merchant.save()
+
+        // automated email to new Merchant !!!COMMENT IN DEV MODE unless it is mocked!!! 
+        // sendMerchantCreationEmail(merchant.email, merchant.name)
+
+        // JWToken for Authorization (It saves the merchant again !)
         const token = await merchant.generateAuthToken()
+
         res.status(201).send( {merchant, token} )
     } catch (e) {
         res.status(400).send()
@@ -79,7 +77,6 @@ router.get('/merchants/me', authMerch, async(req, res) => {
 })
 
 //6.Update Merchant & give description
-//!!!!!!Must add mail for password or mail, +menu!!!!
 router.patch('/merchants/me', authMerch, async(req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['name', 'password', 'email', 'telephone', 'city', 'street', 'number', 'postalCode', 'menu']
@@ -92,6 +89,10 @@ router.patch('/merchants/me', authMerch, async(req, res) => {
     try {
         updates.forEach((update) => req.merchant[update] = req.body[update])
         await req.merchant.save()
+
+        // automated email to updated Merchant !!!COMMENT IN DEV MODE unless it is mocked!!! 
+        // sendMerchantUpdateEmail(merchant.email, merchant.name)
+
         res.send(req.merchant)
     } catch (e) {
         res.status(500).send()
@@ -106,7 +107,10 @@ router.delete('/merchants/me', authMerch, async(req, res) => {
         // await req.merchant.remove()
 
         await req.merchant.deleteOne()
-        // sendCancelationEmail(req.merchant.email, req.merchant.name)
+
+        // automated email to deleted Merchant !!!COMMENT IN DEV MODE unless it is mocked!!! 
+        // sendMerchantDeletionEmail(merchant.email, merchant.name)
+
         res.send(req.merchant)
     } catch (e) {
         res.status(500).send(e) 
